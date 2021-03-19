@@ -37,8 +37,7 @@
         <Button
             android:id="@+id/seven"
             style="@style/calc_button"
-            android:text="7"
-            android:textColor="@color/white"/>
+            android:text="7"/>
 
         <Button
             android:id="@+id/eight"

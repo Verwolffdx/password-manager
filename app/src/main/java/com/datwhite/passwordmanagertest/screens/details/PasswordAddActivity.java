@@ -45,6 +45,7 @@ public class PasswordAddActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+//        setTitleColor(0);
         setTitle(getString(R.string.pass_add_title));
 
         login_input = findViewById(R.id.login_input);
