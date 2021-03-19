@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">PasswordManagerTest</string>
+
+    <string name = "note_text">Введите текст заметки</string>
+    <string name = "note_details_title">Заметка</string>
+    <string name = "save">Сохранить</string>
+    <string name = "completed">Выполнение</string>
+
+    <string name="password">Пароль</string>
+    <string name="login">Логин</string>
+    <string name="email">Почта</string>
+    <string name="website">Сайт</string>
+    <string name = "pass_add_title">Добавить пароль</string>
+    <string name = "pass_details_title">Изменить</string>
+</resources>
