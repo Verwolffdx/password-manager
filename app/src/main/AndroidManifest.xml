@@ -3,15 +3,15 @@
     package="com.datwhite.passwordmanagertest">
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".App"
         android:roundIcon="@drawable/ic_baseline_vpn_key_24"
         android:supportsRtl="true"
         android:theme="@style/Theme.PasswordManagerTest">
 
-        <activity android:name=".Auth.AuthActivity">
+        <activity android:name=".auth.AuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,13 +19,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".screens.main.MainActivity" >
+        <activity android:name=".screens.main.MainActivity">
 
         </activity>
-        <activity android:name=".screens.details.PasswordDetailsActivity"
-            android:theme="@style/Theme.PasswordManagerTest"/>
-        <activity android:name=".screens.details.PasswordAddActivity"
-            android:theme="@style/Theme.PasswordManagerTest"/>
+        <activity
+            android:name=".screens.details.PasswordDetailsActivity"
+            android:theme="@style/Theme.PasswordManagerTest" />
+        <activity
+            android:name=".screens.details.PasswordAddActivity"
+            android:theme="@style/Theme.PasswordManagerTest" />
     </application>
 
 </manifest>

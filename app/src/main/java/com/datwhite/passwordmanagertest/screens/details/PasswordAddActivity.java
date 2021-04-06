@@ -2,6 +2,7 @@ package com.datwhite.passwordmanagertest.screens.details;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,12 +10,26 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.datwhite.passwordmanagertest.App;
 import com.datwhite.passwordmanagertest.R;
 import com.datwhite.passwordmanagertest.model.Password;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+
+import static com.datwhite.passwordmanagertest.crypto.AES.*;
 
 public class PasswordAddActivity extends AppCompatActivity {
 
@@ -59,9 +74,11 @@ public class PasswordAddActivity extends AppCompatActivity {
             email_input.setText(password.getEmail());
             pass_input.setText(password.getText());
             website_input.setText(password.getWebsite());
+
         } else {
             password = new Password();
-        };
+        }
+
 
     }
 
@@ -73,6 +90,7 @@ public class PasswordAddActivity extends AppCompatActivity {
     }
 
     //Обработка нажатий кнопок в меню
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -83,20 +101,51 @@ public class PasswordAddActivity extends AppCompatActivity {
             //Нажатие на кнопку сохранения
             case R.id.action_save:
                 if (login_input.getText().length() > 0 &&
-                    email_input.getText().length() > 0 &&
-                    pass_input.getText().length() > 0 &&
-                    website_input.getText().length() > 0) {
+                        email_input.getText().length() > 0 &&
+                        pass_input.getText().length() > 0 &&
+                        website_input.getText().length() > 0) {
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            password.setLogin(login_input.getText().toString());
+                            password.setEmail(email_input.getText().toString());
 
-                    password.setLogin(login_input.getText().toString());
-                    password.setEmail(email_input.getText().toString());
-                    password.setText(pass_input.getText().toString());
-                    password.setWebsite(website_input.getText().toString());
-                    password.setTimestamp(System.currentTimeMillis());
+                            try {
+                                String algorithm = "AES";
+                                String input = pass_input.getText().toString();
+                                String inputPassword = App.getGlobalPass();
+                                String salt = "GfH31Z5a";
+                                SecretKey key = getKeyFromPassword(inputPassword, salt);
+                                String encrypted = encrypt(algorithm, input, key);
 
-                    App.getInstance().getPasswordDao().insert(password);
+                                password.setText(encrypted);
+                                password.setWebsite(website_input.getText().toString());
+                                password.setTimestamp(System.currentTimeMillis());
 
+                                App.getInstance().getPasswordDao().insert(password);
+                            } catch (NoSuchPaddingException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchAlgorithmException e) {
+                                e.printStackTrace();
+                            } catch (InvalidAlgorithmParameterException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeyException e) {
+                                e.printStackTrace();
+                            } catch (BadPaddingException e) {
+                                e.printStackTrace();
+                            } catch (IllegalBlockSizeException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeySpecException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    };
+                    Thread thread = new Thread(runnable);
+                    thread.start();
                     finish();
                 }
+
                 break;
         }
         return super.onOptionsItemSelected(item);

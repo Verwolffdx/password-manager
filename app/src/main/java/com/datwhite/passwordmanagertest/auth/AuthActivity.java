@@ -1,16 +1,14 @@
-package com.datwhite.passwordmanagertest.Auth;
+package com.datwhite.passwordmanagertest.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.datwhite.passwordmanagertest.App;
 import com.datwhite.passwordmanagertest.R;
 import com.datwhite.passwordmanagertest.screens.main.MainActivity;
 
@@ -48,8 +46,16 @@ public class AuthActivity extends AppCompatActivity {
 //                System.out.println(view.getId());
                 inputKey.setText(inputNumber.onNumPressed(view.getId()));
                 if(inputKey.length() == 4) {
+                    //Переход на страницу с паролями
+                    App.setGlobalPass(inputKey.getText().toString());
                     startActivity(new Intent(AuthActivity.this, MainActivity.class ));
                     finish();
+
+
+                    //Переход на страницу загрузки
+//                    App.setGlobalPass(inputKey.getText().toString());
+//                    startActivity(new Intent(AuthActivity.this, LoadingScreenActivity.class ));
+//                    finish();
                 }
             }
         };

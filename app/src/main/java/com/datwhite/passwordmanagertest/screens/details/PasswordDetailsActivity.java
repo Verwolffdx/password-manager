@@ -2,6 +2,7 @@ package com.datwhite.passwordmanagertest.screens.details;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,12 +10,28 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.datwhite.passwordmanagertest.App;
 import com.datwhite.passwordmanagertest.R;
 import com.datwhite.passwordmanagertest.model.Password;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+
+import static com.datwhite.passwordmanagertest.crypto.AES.decrypt;
+import static com.datwhite.passwordmanagertest.crypto.AES.encrypt;
+import static com.datwhite.passwordmanagertest.crypto.AES.getKeyFromPassword;
 
 public class PasswordDetailsActivity extends AppCompatActivity {
 
@@ -33,6 +50,7 @@ public class PasswordDetailsActivity extends AppCompatActivity {
         caller.startActivity(intent);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +63,7 @@ public class PasswordDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        setTitle(getString(R.string.pass_details_title));
+        setTitle("");
 
         login_output = findViewById(R.id.login_output);
         email_output = findViewById(R.id.email_output);
@@ -55,8 +73,53 @@ public class PasswordDetailsActivity extends AppCompatActivity {
         password = getIntent().getParcelableExtra(EXTRA_PASS);
         login_output.setText(password.getLogin());
         email_output.setText(password.getEmail());
-        pass_output.setText(password.getText());
         website_output.setText(password.getWebsite());
+        pass_output.setText(password.getText());
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+
+                    String algorithm = "AES";
+                    String input = password.getText();
+                    String inputPassword = App.getGlobalPass();
+                    String salt = "GfH31Z5a";
+                    SecretKey key = getKeyFromPassword(inputPassword, salt);
+                    String decrypted = decrypt(algorithm, input, key);
+                    password.setText(decrypted);
+
+
+                    pass_output.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            pass_output.setText(password.getText());
+                        }
+                    });
+//            pass_output.setText(password.getText());
+
+
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                } catch (InvalidKeySpecException e) {
+                    e.printStackTrace();
+                } catch (NoSuchPaddingException e) {
+                    e.printStackTrace();
+                } catch (InvalidAlgorithmParameterException e) {
+                    e.printStackTrace();
+                } catch (InvalidKeyException e) {
+                    e.printStackTrace();
+                } catch (BadPaddingException e) {
+                    e.printStackTrace();
+                } catch (IllegalBlockSizeException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+
+
     }
 
     //Создание меню

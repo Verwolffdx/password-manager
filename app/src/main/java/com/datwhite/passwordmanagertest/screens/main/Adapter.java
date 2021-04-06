@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,19 +13,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SortedList;
 
+import com.datwhite.passwordmanagertest.App;
 import com.datwhite.passwordmanagertest.R;
+import com.datwhite.passwordmanagertest.dialog.CustomDialogFragment;
 import com.datwhite.passwordmanagertest.model.Password;
 import com.datwhite.passwordmanagertest.screens.details.PasswordDetailsActivity;
-import com.datwhite.passwordmanagertest.toast.MakeToast;
-import com.google.android.material.snackbar.Snackbar;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-import static android.content.Context.CLIPBOARD_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import static com.datwhite.passwordmanagertest.crypto.AES.decrypt;
+import static com.datwhite.passwordmanagertest.crypto.AES.getKeyFromPassword;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.PasswordViewHolder> {
 
@@ -130,6 +143,39 @@ public class Adapter extends RecyclerView.Adapter<Adapter.PasswordViewHolder> {
                 @Override
                 public void onClick(View view) {
                     PasswordDetailsActivity.start((Activity) itemView.getContext(), password);
+
+                }
+            });
+
+
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(itemView.getContext());
+                    builder1.setMessage("Удалить?");
+                    builder1.setCancelable(true);
+
+                    builder1.setPositiveButton(
+                            "Да",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    App.getInstance().getPasswordDao().delete(password);
+                                    dialog.cancel();
+                                }
+                            });
+
+                    builder1.setNegativeButton(
+                            "Нет",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
+                    return false;
                 }
             });
 
@@ -137,15 +183,46 @@ public class Adapter extends RecyclerView.Adapter<Adapter.PasswordViewHolder> {
             final android.content.ClipboardManager clipboardManager = (android.content.ClipboardManager) itemView.getContext()
                     .getSystemService(Context.CLIPBOARD_SERVICE);
             copy.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onClick(View v) {
 //                    Snackbar.make(itemView, password.getText(), Snackbar.LENGTH_LONG)
 //                            .show();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                String algorithm = "AES";
+                                String input = password.getText();
+                                String inputPassword = App.getGlobalPass();
+                                String salt = "GfH31Z5a";
+                                SecretKey key = getKeyFromPassword(inputPassword, salt);
+                                String decrypted = decrypt(algorithm, input, key);
+                                clipData = ClipData.newPlainText("text", decrypted);
+                                clipboardManager.setPrimaryClip(clipData);
 
-                    clipData = ClipData.newPlainText("text", password.getText());
-                    clipboardManager.setPrimaryClip(clipData);
 
-                    Toast.makeText(itemView.getContext(),"Copied ",Toast.LENGTH_SHORT).show();
+                            } catch (NoSuchPaddingException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchAlgorithmException e) {
+                                e.printStackTrace();
+                            } catch (InvalidAlgorithmParameterException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeyException e) {
+                                e.printStackTrace();
+                            } catch (BadPaddingException e) {
+                                e.printStackTrace();
+                            } catch (IllegalBlockSizeException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeySpecException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    };
+                    Thread thread = new Thread(runnable);
+                    thread.start();
+                    Toast.makeText(itemView.getContext(), "Copied ", Toast.LENGTH_SHORT).show();
 
 //                    Snackbar.make(itemView, "Copied", Snackbar.LENGTH_LONG)
 //                            .show();

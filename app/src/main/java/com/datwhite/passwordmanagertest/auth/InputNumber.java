@@ -1,6 +1,4 @@
-package com.datwhite.passwordmanagertest.Auth;
-
-import android.widget.Toast;
+package com.datwhite.passwordmanagertest.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.state.State;

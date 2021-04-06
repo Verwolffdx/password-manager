@@ -7,11 +7,25 @@ import androidx.room.Room;
 import com.datwhite.passwordmanagertest.data.AppDatabase;
 import com.datwhite.passwordmanagertest.data.PasswordDao;
 
+import javax.crypto.spec.IvParameterSpec;
+
+import static com.datwhite.passwordmanagertest.crypto.AES.generateIv;
+
 
 public class App extends Application {
 
     private AppDatabase database;
     private PasswordDao passwordDao;
+
+    private static String globalPass;
+
+    public static String getGlobalPass() {
+        return globalPass;
+    }
+
+    public static void setGlobalPass(String text) {
+        globalPass = text;
+    }
 
     private static App instance;
 
