@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.SortedList;
 
 import com.datwhite.passwordmanagertest.App;
 import com.datwhite.passwordmanagertest.R;
-import com.datwhite.passwordmanagertest.dialog.CustomDialogFragment;
 import com.datwhite.passwordmanagertest.model.Password;
 import com.datwhite.passwordmanagertest.screens.details.PasswordDetailsActivity;
 
@@ -148,7 +147,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.PasswordViewHolder> {
             });
 
 
-
+            //Обработка долгого нажатия на элемент,
+            //вызывающая диалоговое окно с выозомжностью удаления записи
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

@@ -24,7 +24,7 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        int[] numberIds = new int[] {
+        int[] numberIds = new int[]{
                 R.id.zero,
                 R.id.one,
                 R.id.two,
@@ -45,17 +45,11 @@ public class AuthActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                System.out.println(view.getId());
                 inputKey.setText(inputNumber.onNumPressed(view.getId()));
-                if(inputKey.length() == 4) {
+                if (inputKey.length() == 4) {
                     //Переход на страницу с паролями
                     App.setGlobalPass(inputKey.getText().toString());
-                    startActivity(new Intent(AuthActivity.this, MainActivity.class ));
+                    startActivity(new Intent(AuthActivity.this, MainActivity.class));
                     finish();
-
-
-                    //Переход на страницу загрузки
-//                    App.setGlobalPass(inputKey.getText().toString());
-//                    startActivity(new Intent(AuthActivity.this, LoadingScreenActivity.class ));
-//                    finish();
                 }
             }
         };
@@ -64,8 +58,6 @@ public class AuthActivity extends AppCompatActivity {
             findViewById(numberIds[i]).setOnClickListener(numberButtonClickListener);
         }
     }
-
-
 
 
 }

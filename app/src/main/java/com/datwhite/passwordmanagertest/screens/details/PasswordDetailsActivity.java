@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,10 +30,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 
 import static com.datwhite.passwordmanagertest.crypto.AES.decrypt;
-import static com.datwhite.passwordmanagertest.crypto.AES.encrypt;
 import static com.datwhite.passwordmanagertest.crypto.AES.getKeyFromPassword;
 
 public class PasswordDetailsActivity extends AppCompatActivity {
@@ -40,6 +41,10 @@ public class PasswordDetailsActivity extends AppCompatActivity {
     private Password password;
 
     private TextView login_output, email_output, pass_output, website_output;
+
+    private View look;
+
+    private boolean isLooked = false;
 
     public static void start(Activity caller, Password password) {
         Intent intent = new Intent(caller, PasswordDetailsActivity.class);
@@ -69,12 +74,17 @@ public class PasswordDetailsActivity extends AppCompatActivity {
         email_output = findViewById(R.id.email_output);
         pass_output = findViewById(R.id.password_output);
         website_output = findViewById(R.id.website_output);
+        look = findViewById(R.id.look);
 
         password = getIntent().getParcelableExtra(EXTRA_PASS);
         login_output.setText(password.getLogin());
         email_output.setText(password.getEmail());
         website_output.setText(password.getWebsite());
-        pass_output.setText(password.getText());
+//        pass_output.setInputType(InputType.TYPE_CLASS_TEXT);
+        pass_output.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+        pass_output.setText("Расшифровка пароля...");
+
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -87,6 +97,9 @@ public class PasswordDetailsActivity extends AppCompatActivity {
                     String salt = "GfH31Z5a";
                     SecretKey key = getKeyFromPassword(inputPassword, salt);
                     String decrypted = decrypt(algorithm, input, key);
+//                    pass_output.setInputType(InputType.TYPE_CLASS_TEXT |
+//                            InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    pass_output.setTransformationMethod(PasswordTransformationMethod.getInstance());
                     password.setText(decrypted);
 
 
@@ -119,6 +132,20 @@ public class PasswordDetailsActivity extends AppCompatActivity {
         Thread thread = new Thread(runnable);
         thread.start();
 
+
+        look.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isLooked) {
+                    pass_output.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    isLooked = true;
+                }
+                else {
+                    pass_output.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    isLooked = false;
+                }
+            }
+        });
 
     }
 
