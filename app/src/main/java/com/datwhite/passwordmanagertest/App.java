@@ -6,16 +6,14 @@ import androidx.room.Room;
 
 import com.datwhite.passwordmanagertest.data.AppDatabase;
 import com.datwhite.passwordmanagertest.data.PasswordDao;
-
-import javax.crypto.spec.IvParameterSpec;
-
-import static com.datwhite.passwordmanagertest.crypto.AES.generateIv;
+import com.datwhite.passwordmanagertest.data.UserPasswordDao;
 
 
 public class App extends Application {
 
     private AppDatabase database;
     private PasswordDao passwordDao;
+    private UserPasswordDao userPasswordDao;
 
     private static String globalPass;
 
@@ -40,11 +38,12 @@ public class App extends Application {
         instance = this;
 
         database = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "passw-db-test")
+                AppDatabase.class, "passw-db-test-3")
                 .allowMainThreadQueries()
                 .build();
 
         passwordDao = database.passwordDao();
+        userPasswordDao = database.userPasswordDao();
     }
 
     public AppDatabase getDatabase() {
@@ -61,5 +60,13 @@ public class App extends Application {
 
     public void setPasswordDao(PasswordDao passwordDao) {
         this.passwordDao = passwordDao;
+    }
+
+    public UserPasswordDao getUserPasswordDao() {
+        return userPasswordDao;
+    }
+
+    public void setUserPasswordDao(UserPasswordDao userPasswordDao) {
+        this.userPasswordDao = userPasswordDao;
     }
 }

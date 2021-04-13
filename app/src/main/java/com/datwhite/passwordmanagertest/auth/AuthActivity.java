@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.datwhite.passwordmanagertest.App;
 import com.datwhite.passwordmanagertest.R;
+import com.datwhite.passwordmanagertest.model.UserPassword;
 import com.datwhite.passwordmanagertest.screens.main.MainActivity;
 
 public class AuthActivity extends AppCompatActivity {
@@ -17,6 +18,7 @@ public class AuthActivity extends AppCompatActivity {
 
     private TextView inputKey;
     private InputNumber inputNumber;
+    private UserPassword userPassword;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,17 +42,34 @@ public class AuthActivity extends AppCompatActivity {
         inputKey = findViewById(R.id.inputKey);
         inputNumber = new InputNumber();
 
+        userPassword = App.getInstance().getUserPasswordDao().getUserPassword();
+
         View.OnClickListener numberButtonClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                System.out.println(view.getId());
                 inputKey.setText(inputNumber.onNumPressed(view.getId()));
+//                String input = inputKey.getText().toString();
+
+                System.out.println("INPUT " + inputKey.getText());
+                System.out.println("DB " + userPassword.getUserpassword());
+
+
                 if (inputKey.length() == 4) {
-                    //Переход на страницу с паролями
-                    App.setGlobalPass(inputKey.getText().toString());
-                    startActivity(new Intent(AuthActivity.this, MainActivity.class));
-                    finish();
+                    if (inputKey.getText().toString().equals(userPassword.getUserpassword())) {
+                        //Переход на страницу с паролями
+                        App.setGlobalPass(inputKey.getText().toString());
+                        startActivity(new Intent(AuthActivity.this, MainActivity.class));
+                        finish();
+                    }
                 }
+
+//                if (inputKey.length() == 4) {
+//                    //Переход на страницу с паролями
+//                    App.setGlobalPass(inputKey.getText().toString());
+//                    startActivity(new Intent(AuthActivity.this, MainActivity.class));
+//                    finish();
+//                }
             }
         };
 
